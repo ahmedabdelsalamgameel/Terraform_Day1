@@ -16,26 +16,32 @@ data "aws_ami" "ubuntu" {
 
 resource "aws_instance" "bastion" {
   ami           = data.aws_ami.ubuntu.id
-  instance_type = "t2.micro"
+  instance_type = var.instance_type
   associate_public_ip_address = true
   vpc_security_group_ids = [aws_security_group.sg_public.id]
-  subnet_id = aws_subnet.public_subnet_1.id
+  subnet_id = module.network.pb1_sub_id
   key_name = aws_key_pair.generated_key.id
 
   tags = {
     Name = "bastion_ec2"
   }
+  # provisioner "remote-exec" {
+  #   inline = [
+  #     "echo the server's ip = ${self.public_ip}" 
+  #   ]
+  # }
 }
 resource "aws_instance" "application" {
   ami           = data.aws_ami.ubuntu.id
-  instance_type = "t2.micro"
+  instance_type = var.instance_type
   vpc_security_group_ids = [aws_security_group.sg_private.id]
-  subnet_id = aws_subnet.private_subnet_1.id
+  subnet_id = module.network.pt1_sub_id
   key_name = aws_key_pair.generated_key.id
 
   tags = {
     Name = "application_ec2"
   }
+
 }
 
 resource "tls_private_key" "my_key" {
