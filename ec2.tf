@@ -25,11 +25,9 @@ resource "aws_instance" "bastion" {
   tags = {
     Name = "bastion_ec2"
   }
-  # provisioner "remote-exec" {
-  #   inline = [
-  #     "echo the server's ip = ${self.public_ip}" 
-  #   ]
-  # }
+  provisioner "local-exec" {
+      command = "echo ${self.public_ip}"
+  }
 }
 resource "aws_instance" "application" {
   ami           = data.aws_ami.ubuntu.id
